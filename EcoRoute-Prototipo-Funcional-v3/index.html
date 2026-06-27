@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="EcoRoute Logistic AI - Prototipo funcional completo para Transportes Sur-Austral" />
+  <title>EcoRoute Logistic AI | Plataforma Logística</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">ER</div>
+      <div>
+        <h1>EcoRoute Logistic AI</h1>
+        <p>Gestión logística Sur-Austral</p>
+      </div>
+    </div>
+
+    <button id="mobileMenuBtn" class="mobile-menu" type="button" aria-label="Abrir menú">☰</button>
+
+    <nav id="mainNav" class="nav">
+      <button class="nav-link active" type="button" data-page="dashboardPage">Inicio</button>
+      <button class="nav-link" type="button" data-page="dispatchPage">Despachos</button>
+      <button class="nav-link" type="button" data-page="trackingPage">Seguimiento</button>
+      <button class="nav-link" type="button" data-page="usersPage">Usuarios</button>
+      <button class="nav-link" type="button" data-page="vehiclesPage">Vehículos</button>
+      <button class="nav-link" type="button" data-page="routesPage">Rutas</button>
+      <button class="nav-link" type="button" data-page="weatherPage">Clima</button>
+      <button class="nav-link" type="button" data-page="databasePage">Base de datos</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <span class="badge soft">Prototipo funcional completo</span>
+        <h2>Plataforma centralizada para despachos, rutas, trabajadores, vehículos y clima</h2>
+        <p>
+          Todos los módulos guardan información en una base local del navegador. Puedes agregar, modificar,
+          eliminar, consultar y visualizar los datos registrados sin instalar nada adicional.
+        </p>
+      </div>
+      <div class="db-card">
+        <span id="dbLight" class="db-light"></span>
+        <strong id="dbText">Cargando base local...</strong>
+        <small>Almacenamiento interno con IndexedDB</small>
+      </div>
+    </section>
+
+    <section class="kpi-grid">
+      <article class="kpi-card">
+        <span>Despachos</span>
+        <strong id="kpiDispatches">0</strong>
+      </article>
+      <article class="kpi-card blue">
+        <span>En ruta</span>
+        <strong id="kpiInRoute">0</strong>
+      </article>
+      <article class="kpi-card green">
+        <span>Trabajadores</span>
+        <strong id="kpiUsers">0</strong>
+      </article>
+      <article class="kpi-card orange">
+        <span>Alertas activas</span>
+        <strong id="kpiWeather">0</strong>
+      </article>
+    </section>
+
+    <section id="dashboardPage" class="page active-page">
+      <div class="page-head">
+        <div>
+          <h2>Panel principal</h2>
+          <p>Resumen general de la operación, últimos movimientos y estado actual de la flota.</p>
+        </div>
+        <div class="action-row">
+          <button id="goNewDispatchBtn" class="primary-btn" type="button">Registrar despacho</button>
+          <button id="refreshDashboardBtn" class="secondary-btn" type="button">Actualizar panel</button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="card large-card">
+          <div class="card-title">
+            <h3>Despachos recientes</h3>
+            <button id="goDispatchListBtn" class="text-btn" type="button">Ver todos</button>
+          </div>
+          <div class="table-wrap small-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Guía</th>
+                  <th>Cliente</th>
+                  <th>Destino</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardDispatchBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-title">
+            <h3>Alertas de clima</h3>
+            <button id="goWeatherBtn" class="text-btn" type="button">Administrar</button>
+          </div>
+          <div id="dashboardWeatherList" class="mini-list"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-title">
+            <h3>Vehículos disponibles</h3>
+            <button id="goVehiclesBtn" class="text-btn" type="button">Ver vehículos</button>
+          </div>
+          <div id="dashboardVehiclesList" class="mini-list"></div>
+        </article>
+
+        <article class="card large-card">
+          <div class="card-title">
+            <h3>Últimas notificaciones</h3>
+            <button id="clearNotificationsBtn" class="text-btn danger-text" type="button">Limpiar</button>
+          </div>
+          <div id="dashboardNotifications" class="notification-feed"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="dispatchPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Gestión de despachos</h2>
+          <p>Registra nuevos despachos, actualiza estados, edita información, elimina registros y asigna rutas.</p>
+        </div>
+        <div class="action-row">
+          <button id="loadDemoDispatchBtn" class="secondary-btn" type="button">Cargar ejemplos</button>
+          <button id="resetDispatchFormBtn" class="secondary-btn" type="button">Nuevo formulario</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <form id="dispatchForm" class="card form-card" novalidate>
+          <input id="dispatchId" type="hidden" />
+          <div class="card-title">
+            <h3 id="dispatchFormTitle">Registrar despacho</h3>
+            <span class="pill">Validación activa</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="dispatchGuide">Número de guía</label>
+              <input id="dispatchGuide" type="text" placeholder="Ej: GU-2001" autocomplete="off" />
+              <small data-error="dispatchGuide"></small>
+            </div>
+            <div class="field">
+              <label for="dispatchClient">Cliente</label>
+              <input id="dispatchClient" type="text" list="clientDatalist" placeholder="Ej: Empresa Norte S.A." autocomplete="off" />
+              <datalist id="clientDatalist"></datalist>
+              <small data-error="dispatchClient"></small>
+            </div>
+            <div class="field">
+              <label for="dispatchOrigin">Origen</label>
+              <input id="dispatchOrigin" type="text" placeholder="Ej: Santiago" autocomplete="off" />
+              <small data-error="dispatchOrigin"></small>
+            </div>
+            <div class="field">
+              <label for="dispatchDestination">Destino</label>
+              <input id="dispatchDestination" type="text" placeholder="Ej: Punta Arenas" autocomplete="off" />
+              <small data-error="dispatchDestination"></small>
+            </div>
+            <div class="field">
+              <label for="dispatchDriver">Conductor</label>
+              <select id="dispatchDriver"></select>
+              <small data-error="dispatchDriver"></small>
+            </div>
+            <div class="field">
+              <label for="dispatchVehicle">Vehículo</label>
+              <select id="dispatchVehicle"></select>
+              <small data-error="dispatchVehicle"></small>
+            </div>
+            <div class="field full-field">
+              <label for="dispatchStatus">Estado inicial</label>
+              <select id="dispatchStatus">
+                <option value="">Seleccionar estado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En ruta">En ruta</option>
+                <option value="Retrasado">Retrasado</option>
+                <option value="Entregado">Entregado</option>
+              </select>
+              <small data-error="dispatchStatus"></small>
+            </div>
+          </div>
+
+          <div id="dispatchFormMessage" class="inline-message"></div>
+
+          <div class="action-row form-actions">
+            <button id="saveDispatchBtn" class="primary-btn" type="submit">Guardar despacho</button>
+            <button id="cancelDispatchEditBtn" class="secondary-btn hidden" type="button">Cancelar edición</button>
+          </div>
+        </form>
+
+        <aside class="card details-card">
+          <div class="card-title">
+            <h3>Detalle seleccionado</h3>
+            <button id="closeDispatchDetailBtn" class="text-btn" type="button">Limpiar</button>
+          </div>
+          <div id="dispatchDetailBox" class="detail-box">
+            <p>Selecciona un despacho de la tabla para ver su detalle, ubicación simulada y ruta asignada.</p>
+          </div>
+        </aside>
+      </div>
+
+      <article class="card table-card">
+        <div class="table-toolbar">
+          <div>
+            <h3>Listado de despachos guardados</h3>
+            <p>Los datos se guardan en la base local y aparecen inmediatamente en pantalla.</p>
+          </div>
+          <div class="filter-row">
+            <input id="dispatchSearch" type="search" placeholder="Buscar guía, cliente, conductor..." />
+            <select id="dispatchStatusFilter">
+              <option value="">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="En ruta">En ruta</option>
+              <option value="Retrasado">Retrasado</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Guía</th>
+                <th>Cliente</th>
+                <th>Trayecto</th>
+                <th>Conductor</th>
+                <th>Vehículo</th>
+                <th>Estado</th>
+                <th>Ruta</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="dispatchTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="trackingPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Seguimiento de envío</h2>
+          <p>Vista para clientes. Busca un despacho por número de guía y revisa su estado actualizado.</p>
+        </div>
+      </div>
+
+      <article class="card tracking-card">
+        <div class="search-panel">
+          <label for="trackingGuide">Número de guía</label>
+          <div class="search-line">
+            <input id="trackingGuide" type="text" placeholder="Ej: GU-2001" autocomplete="off" />
+            <button id="searchTrackingBtn" class="primary-btn" type="button">Buscar envío</button>
+            <button id="clearTrackingBtn" class="secondary-btn" type="button">Limpiar</button>
+          </div>
+        </div>
+        <div id="trackingResult" class="tracking-result"></div>
+      </article>
+    </section>
+
+    <section id="usersPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Usuarios y trabajadores</h2>
+          <p>Administra conductores, administradores, clientes y gerencia. Los conductores se usan en el formulario de despachos.</p>
+        </div>
+        <button id="newUserBtn" class="secondary-btn" type="button">Nuevo usuario</button>
+      </div>
+
+      <div class="grid-2">
+        <form id="userForm" class="card form-card" novalidate>
+          <input id="userId" type="hidden" />
+          <div class="card-title">
+            <h3 id="userFormTitle">Registrar usuario</h3>
+            <span class="pill green">Guardado local</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="userName">Nombre</label>
+              <input id="userName" type="text" placeholder="Ej: Pedro Ramírez" autocomplete="off" />
+              <small data-error="userName"></small>
+            </div>
+            <div class="field">
+              <label for="userRole">Tipo de usuario</label>
+              <select id="userRole">
+                <option value="">Seleccionar</option>
+                <option value="Conductor">Conductor</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Cliente">Cliente</option>
+                <option value="Gerencia">Gerencia</option>
+              </select>
+              <small data-error="userRole"></small>
+            </div>
+            <div class="field">
+              <label for="userPhone">Teléfono</label>
+              <input id="userPhone" type="text" placeholder="Ej: +56 9 8123 4567" autocomplete="off" />
+              <small data-error="userPhone"></small>
+            </div>
+            <div class="field">
+              <label for="userEmail">Correo</label>
+              <input id="userEmail" type="email" placeholder="correo@empresa.cl" autocomplete="off" />
+              <small data-error="userEmail"></small>
+            </div>
+            <div class="field full-field">
+              <label for="userStatus">Estado</label>
+              <select id="userStatus">
+                <option value="Activo">Activo</option>
+                <option value="En ruta">En ruta</option>
+                <option value="Disponible">Disponible</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+          </div>
+          <div id="userFormMessage" class="inline-message"></div>
+          <div class="action-row form-actions">
+            <button class="primary-btn" type="submit">Guardar usuario</button>
+            <button id="cancelUserEditBtn" class="secondary-btn hidden" type="button">Cancelar edición</button>
+          </div>
+        </form>
+
+        <article class="card">
+          <div class="card-title">
+            <h3>Resumen de personal</h3>
+            <button id="loadDemoUsersBtn" class="text-btn" type="button">Cargar ejemplos</button>
+          </div>
+          <div id="userSummary" class="summary-grid"></div>
+        </article>
+      </div>
+
+      <article class="card table-card">
+        <div class="table-toolbar">
+          <div>
+            <h3>Usuarios registrados</h3>
+            <p>Editar, eliminar o cambiar estado actualiza la base de datos local.</p>
+          </div>
+          <input id="userSearch" type="search" placeholder="Buscar usuario..." />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="vehiclesPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Vehículos</h2>
+          <p>Registra camiones, revisa disponibilidad, estado operativo y sensores de carga.</p>
+        </div>
+        <button id="newVehicleBtn" class="secondary-btn" type="button">Nuevo vehículo</button>
+      </div>
+
+      <div class="grid-2">
+        <form id="vehicleForm" class="card form-card" novalidate>
+          <input id="vehicleId" type="hidden" />
+          <div class="card-title">
+            <h3 id="vehicleFormTitle">Registrar vehículo</h3>
+            <span class="pill blue">Flota</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="vehiclePlate">Patente</label>
+              <input id="vehiclePlate" type="text" placeholder="Ej: FJKL-23" autocomplete="off" />
+              <small data-error="vehiclePlate"></small>
+            </div>
+            <div class="field">
+              <label for="vehicleType">Tipo</label>
+              <select id="vehicleType">
+                <option value="">Seleccionar</option>
+                <option value="Carga general">Carga general</option>
+                <option value="Refrigerado">Refrigerado</option>
+                <option value="Plataforma">Plataforma</option>
+                <option value="Tolva">Tolva</option>
+              </select>
+              <small data-error="vehicleType"></small>
+            </div>
+            <div class="field">
+              <label for="vehicleCapacity">Capacidad</label>
+              <input id="vehicleCapacity" type="text" placeholder="Ej: 20 toneladas" autocomplete="off" />
+              <small data-error="vehicleCapacity"></small>
+            </div>
+            <div class="field">
+              <label for="vehicleKm">Kilometraje</label>
+              <input id="vehicleKm" type="number" min="0" placeholder="Ej: 120000" />
+              <small data-error="vehicleKm"></small>
+            </div>
+            <div class="field">
+              <label for="vehicleStatus">Estado</label>
+              <select id="vehicleStatus">
+                <option value="Disponible">Disponible</option>
+                <option value="En ruta">En ruta</option>
+                <option value="Mantención">Mantención</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="vehicleSensor">Sensor de carga</label>
+              <select id="vehicleSensor">
+                <option value="Sin sensor">Sin sensor</option>
+                <option value="Temperatura">Temperatura</option>
+                <option value="GPS + Temperatura">GPS + Temperatura</option>
+              </select>
+            </div>
+          </div>
+          <div id="vehicleFormMessage" class="inline-message"></div>
+          <div class="action-row form-actions">
+            <button class="primary-btn" type="submit">Guardar vehículo</button>
+            <button id="cancelVehicleEditBtn" class="secondary-btn hidden" type="button">Cancelar edición</button>
+          </div>
+        </form>
+
+        <article class="card">
+          <div class="card-title">
+            <h3>Estado de flota</h3>
+            <button id="loadDemoVehiclesBtn" class="text-btn" type="button">Cargar ejemplos</button>
+          </div>
+          <div id="vehicleSummary" class="summary-grid"></div>
+        </article>
+      </div>
+
+      <article class="card table-card">
+        <div class="table-toolbar">
+          <div>
+            <h3>Vehículos registrados</h3>
+            <p>Estos vehículos aparecen en el formulario de despachos.</p>
+          </div>
+          <input id="vehicleSearch" type="search" placeholder="Buscar patente o tipo..." />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patente</th>
+                <th>Tipo</th>
+                <th>Capacidad</th>
+                <th>Kilometraje</th>
+                <th>Sensor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="vehicleTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="routesPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Rutas</h2>
+          <p>Crea rutas logísticas, calcula una recomendación y asígnalas a despachos.</p>
+        </div>
+        <button id="newRouteBtn" class="secondary-btn" type="button">Nueva ruta</button>
+      </div>
+
+      <div class="grid-2 align-start">
+        <form id="routeForm" class="card form-card" novalidate>
+          <input id="routeId" type="hidden" />
+          <div class="card-title">
+            <h3 id="routeFormTitle">Registrar ruta</h3>
+            <span class="pill orange">Optimización</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="routeName">Nombre de ruta</label>
+              <input id="routeName" type="text" placeholder="Ej: Santiago - Punta Arenas" autocomplete="off" />
+              <small data-error="routeName"></small>
+            </div>
+            <div class="field">
+              <label for="routeRisk">Riesgo</label>
+              <select id="routeRisk">
+                <option value="Bajo">Bajo</option>
+                <option value="Medio">Medio</option>
+                <option value="Alto">Alto</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="routeOrigin">Origen</label>
+              <input id="routeOrigin" type="text" placeholder="Ej: Santiago" autocomplete="off" />
+              <small data-error="routeOrigin"></small>
+            </div>
+            <div class="field">
+              <label for="routeDestination">Destino</label>
+              <input id="routeDestination" type="text" placeholder="Ej: Punta Arenas" autocomplete="off" />
+              <small data-error="routeDestination"></small>
+            </div>
+            <div class="field">
+              <label for="routeDistance">Distancia km</label>
+              <input id="routeDistance" type="number" min="1" placeholder="Ej: 3000" />
+              <small data-error="routeDistance"></small>
+            </div>
+            <div class="field">
+              <label for="routeTime">Tiempo estimado</label>
+              <input id="routeTime" type="text" placeholder="Ej: 48 horas" autocomplete="off" />
+              <small data-error="routeTime"></small>
+            </div>
+          </div>
+          <div id="routeFormMessage" class="inline-message"></div>
+          <div class="action-row form-actions">
+            <button class="primary-btn" type="submit">Guardar ruta</button>
+            <button id="cancelRouteEditBtn" class="secondary-btn hidden" type="button">Cancelar edición</button>
+          </div>
+        </form>
+
+        <article class="card planner-card">
+          <div class="card-title">
+            <h3>Calculador de ruta sugerida</h3>
+            <button id="loadDemoRoutesBtn" class="text-btn" type="button">Cargar ejemplos</button>
+          </div>
+          <div class="form-grid one-col">
+            <div class="field">
+              <label for="plannerOrigin">Origen</label>
+              <input id="plannerOrigin" type="text" placeholder="Ej: Santiago" />
+            </div>
+            <div class="field">
+              <label for="plannerDestination">Destino</label>
+              <input id="plannerDestination" type="text" placeholder="Ej: Punta Arenas" />
+            </div>
+          </div>
+          <div class="action-row form-actions">
+            <button id="calculateRouteBtn" class="primary-btn" type="button">Calcular sugerencia</button>
+            <button id="clearPlannerBtn" class="secondary-btn" type="button">Limpiar</button>
+          </div>
+          <div id="plannerResult" class="planner-result"></div>
+        </article>
+      </div>
+
+      <article class="card table-card">
+        <div class="table-toolbar">
+          <div>
+            <h3>Rutas guardadas</h3>
+            <p>Las rutas se pueden asignar desde cada despacho registrado.</p>
+          </div>
+          <input id="routeSearch" type="search" placeholder="Buscar ruta..." />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ruta</th>
+                <th>Trayecto</th>
+                <th>Distancia</th>
+                <th>Tiempo</th>
+                <th>Riesgo</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="routeTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="weatherPage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Clima y alertas</h2>
+          <p>Registra alertas climáticas simuladas que pueden afectar rutas australes.</p>
+        </div>
+        <div class="action-row">
+          <button id="randomWeatherBtn" class="secondary-btn" type="button">Generar alerta simulada</button>
+          <button id="newWeatherBtn" class="secondary-btn" type="button">Nueva alerta</button>
+        </div>
+      </div>
+
+      <div class="grid-2 align-start">
+        <form id="weatherForm" class="card form-card" novalidate>
+          <input id="weatherId" type="hidden" />
+          <div class="card-title">
+            <h3 id="weatherFormTitle">Registrar alerta</h3>
+            <span class="pill red">Rutas críticas</span>
+          </div>
+          <div class="form-grid one-col">
+            <div class="field">
+              <label for="weatherZone">Zona o ruta</label>
+              <input id="weatherZone" type="text" placeholder="Ej: Ruta 9 - Punta Arenas" autocomplete="off" />
+              <small data-error="weatherZone"></small>
+            </div>
+            <div class="field">
+              <label for="weatherLevel">Nivel</label>
+              <select id="weatherLevel">
+                <option value="Informativa">Informativa</option>
+                <option value="Precaución">Precaución</option>
+                <option value="Crítica">Crítica</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="weatherDescription">Descripción</label>
+              <input id="weatherDescription" type="text" placeholder="Ej: Escarcha y fuertes rachas de viento" autocomplete="off" />
+              <small data-error="weatherDescription"></small>
+            </div>
+            <div class="field">
+              <label for="weatherRecommendation">Recomendación</label>
+              <input id="weatherRecommendation" type="text" placeholder="Ej: Conducir con precaución y monitorear GPS" autocomplete="off" />
+              <small data-error="weatherRecommendation"></small>
+            </div>
+          </div>
+          <div id="weatherFormMessage" class="inline-message"></div>
+          <div class="action-row form-actions">
+            <button class="primary-btn" type="submit">Guardar alerta</button>
+            <button id="cancelWeatherEditBtn" class="secondary-btn hidden" type="button">Cancelar edición</button>
+          </div>
+        </form>
+
+        <article class="card weather-panel-card">
+          <div class="card-title">
+            <h3>Panel visual de alertas</h3>
+            <button id="loadDemoWeatherBtn" class="text-btn" type="button">Cargar ejemplos</button>
+          </div>
+          <div id="weatherPanelList" class="weather-list"></div>
+        </article>
+      </div>
+
+      <article class="card table-card">
+        <div class="table-toolbar">
+          <div>
+            <h3>Alertas guardadas</h3>
+            <p>Editar o eliminar una alerta actualiza el panel visual y la base local.</p>
+          </div>
+          <input id="weatherSearch" type="search" placeholder="Buscar alerta..." />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Zona</th>
+                <th>Nivel</th>
+                <th>Descripción</th>
+                <th>Recomendación</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="weatherTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="databasePage" class="page">
+      <div class="page-head">
+        <div>
+          <h2>Base de datos local</h2>
+          <p>Visualiza lo que se guarda en cada módulo. También puedes exportar, importar o reiniciar datos.</p>
+        </div>
+        <div class="action-row">
+          <button id="refreshDatabaseBtn" class="secondary-btn" type="button">Actualizar datos</button>
+          <button id="exportDatabaseBtn" class="primary-btn" type="button">Exportar JSON</button>
+          <label class="file-btn">
+            Importar JSON
+            <input id="importDatabaseInput" type="file" accept="application/json" />
+          </label>
+          <button id="resetDatabaseBtn" class="danger-btn" type="button">Reiniciar todo</button>
+        </div>
+      </div>
+
+      <div class="database-grid">
+        <article class="card db-box">
+          <h3>Despachos</h3>
+          <strong id="dbCountDispatches">0</strong>
+        </article>
+        <article class="card db-box">
+          <h3>Usuarios</h3>
+          <strong id="dbCountUsers">0</strong>
+        </article>
+        <article class="card db-box">
+          <h3>Vehículos</h3>
+          <strong id="dbCountVehicles">0</strong>
+        </article>
+        <article class="card db-box">
+          <h3>Rutas</h3>
+          <strong id="dbCountRoutes">0</strong>
+        </article>
+        <article class="card db-box">
+          <h3>Clima</h3>
+          <strong id="dbCountWeather">0</strong>
+        </article>
+        <article class="card db-box">
+          <h3>Notificaciones</h3>
+          <strong id="dbCountNotifications">0</strong>
+        </article>
+      </div>
+
+      <article class="card">
+        <div class="card-title">
+          <h3>Vista rápida de datos guardados</h3>
+          <button id="copyDatabaseBtn" class="text-btn" type="button">Copiar resumen</button>
+        </div>
+        <pre id="databasePreview" class="database-preview"></pre>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>Prototipo v2.0 - Plataforma funcional completa</strong>
+    <span>HTML, CSS y JavaScript separados · Base local IndexedDB · CRUD completo · Navegación interactiva · Datos persistentes</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
