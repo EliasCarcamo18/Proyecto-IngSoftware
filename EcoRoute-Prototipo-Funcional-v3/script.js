@@ -1,10 +1,5 @@
 'use strict';
 
-/* =========================================================
-   EcoRoute Logistic AI - Prototipo funcional completo
-   Base local: IndexedDB
-   Módulos: Despachos, Seguimiento, Usuarios, Vehículos, Rutas, Clima y Base de datos
-   ========================================================= */
 
 const DB_NAME = 'EcoRouteLogisticAI_Completo_DB';
 const DB_VERSION = 1;
