@@ -1,6 +1,5 @@
 'use strict';
 
-
 const DB_NAME = 'EcoRouteLogisticAI_Completo_DB';
 const DB_VERSION = 1;
 const STORES = {
