@@ -42,13 +42,14 @@ const demoData = {
     { id: id(), plate: 'MKPL-89', type: 'Carga general', capacity: '12 toneladas', km: 98000, sensor: 'GPS + Temperatura', status: 'Disponible' },
     { id: id(), plate: 'CDRT-67', type: 'Tolva', capacity: '25 toneladas', km: 312000, sensor: 'Sin sensor', status: 'Mantención' }
   ],
-  
+
   routes: [
     { id: id(), name: 'Ruta Santiago - Punta Arenas', origin: 'Santiago', destination: 'Punta Arenas', distance: 3000, time: '48 horas', risk: 'Alto' },
     { id: id(), name: 'Ruta Santiago - Puerto Montt', origin: 'Santiago', destination: 'Puerto Montt', distance: 1030, time: '14 horas', risk: 'Medio' },
     { id: id(), name: 'Ruta Temuco - Coyhaique', origin: 'Temuco', destination: 'Coyhaique', distance: 980, time: '20 horas', risk: 'Medio' },
     { id: id(), name: 'Ruta Santiago - Osorno', origin: 'Santiago', destination: 'Osorno', distance: 940, time: '12 horas', risk: 'Bajo' }
   ],
+  
   weather: [
     { id: id(), zone: 'Ruta 9 - Punta Arenas', level: 'Crítica', description: 'Escarcha y fuertes rachas de viento', recommendation: 'Conducir con precaución y monitorear ubicación del camión' },
     { id: id(), zone: 'Región de Aysén', level: 'Precaución', description: 'Lluvia intensa y baja visibilidad', recommendation: 'Reducir velocidad y evitar adelantamientos' },
