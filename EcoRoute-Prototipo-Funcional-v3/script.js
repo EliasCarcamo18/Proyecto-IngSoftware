@@ -1,11 +1,5 @@
 'use strict';
 
-/* =========================================================
-   EcoRoute Logistic AI - Prototipo funcional completo
-   Base local: IndexedDB
-   Módulos: Despachos, Seguimiento, Usuarios, Vehículos, Rutas, Clima y Base de datos
-   ========================================================= */
-
 const DB_NAME = 'EcoRouteLogisticAI_Completo_DB';
 const DB_VERSION = 1;
 const STORES = {
@@ -41,18 +35,21 @@ const demoData = {
     { id: id(), name: 'Retail Austral', role: 'Cliente', phone: '+56 2 9988 7766', email: 'logistica@retailaustral.cl', status: 'Activo' },
     { id: id(), name: 'Ana Valdivia', role: 'Gerencia', phone: '+56 9 1122 3344', email: 'ana.valdivia@sur-austral.cl', status: 'Activo' }
   ],
+
   vehicles: [
     { id: id(), plate: 'FJKL-23', type: 'Refrigerado', capacity: '20 toneladas', km: 245000, sensor: 'GPS + Temperatura', status: 'En ruta' },
     { id: id(), plate: 'BGHJ-45', type: 'Carga general', capacity: '15 toneladas', km: 183000, sensor: 'GPS + Temperatura', status: 'Disponible' },
     { id: id(), plate: 'MKPL-89', type: 'Carga general', capacity: '12 toneladas', km: 98000, sensor: 'GPS + Temperatura', status: 'Disponible' },
     { id: id(), plate: 'CDRT-67', type: 'Tolva', capacity: '25 toneladas', km: 312000, sensor: 'Sin sensor', status: 'Mantención' }
   ],
+
   routes: [
     { id: id(), name: 'Ruta Santiago - Punta Arenas', origin: 'Santiago', destination: 'Punta Arenas', distance: 3000, time: '48 horas', risk: 'Alto' },
     { id: id(), name: 'Ruta Santiago - Puerto Montt', origin: 'Santiago', destination: 'Puerto Montt', distance: 1030, time: '14 horas', risk: 'Medio' },
     { id: id(), name: 'Ruta Temuco - Coyhaique', origin: 'Temuco', destination: 'Coyhaique', distance: 980, time: '20 horas', risk: 'Medio' },
     { id: id(), name: 'Ruta Santiago - Osorno', origin: 'Santiago', destination: 'Osorno', distance: 940, time: '12 horas', risk: 'Bajo' }
   ],
+  
   weather: [
     { id: id(), zone: 'Ruta 9 - Punta Arenas', level: 'Crítica', description: 'Escarcha y fuertes rachas de viento', recommendation: 'Conducir con precaución y monitorear ubicación del camión' },
     { id: id(), zone: 'Región de Aysén', level: 'Precaución', description: 'Lluvia intensa y baja visibilidad', recommendation: 'Reducir velocidad y evitar adelantamientos' },
