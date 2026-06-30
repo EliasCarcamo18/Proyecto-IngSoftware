@@ -17,9 +17,10 @@
 				}
 			})
 		}
-
-	
+		"aa"
 		
+
+
 			function eliminar (id)
 		{
 			var q= $("#q").val();
