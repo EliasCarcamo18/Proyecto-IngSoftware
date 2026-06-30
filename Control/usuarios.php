@@ -53,7 +53,7 @@
 						</div>
 				
 				
-				
+			
 			</form>
 				<div id="resultados"></div><!-- Carga los datos ajax -->
 				<div class='outer_div'></div><!-- Carga los datos ajax -->
@@ -70,7 +70,6 @@
 
 	
 	
-
 
   </body>
 </html>
